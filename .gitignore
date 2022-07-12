@@ -1,0 +1,6 @@
+*.log
+*.aux
+*.sagetex.sage
+*.sout
+*scmd
+*.sagetex.sage.py

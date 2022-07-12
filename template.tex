@@ -1,0 +1,29 @@
+\documentclass[a4paper, 12pt]{scrartcl}
+
+\usepackage[utf8]{inputenc} % Character encoding. Unicode Transformation Format - 8-bit
+\usepackage[T1]{fontenc} % Font encoding.
+\usepackage[spanish]{babel} % Estilo spanish para el sistema babel. Javier Bezos
+%http://tug.ctan.org/tex-archive/language/babel/contrib/spanish/spanish.pdf
+\usepackage{tikz} % creating graphics(vector graphics) programmatically 
+
+
+\usepackage{sagetex} % add Sage code and run it directly in a LaTeX document
+% ~/Library/texmf/tex/latex/sagetex/sagetex.sty
+
+
+
+\begin{document}
+
+
+\begin{sagesilent}
+def nota():
+    return ""
+\end{sagesilent}
+
+text the proof in \LaTeX
+
+Lista de estudiantes: $\sage{sqrt(4)}$
+
+
+
+\end{document}
