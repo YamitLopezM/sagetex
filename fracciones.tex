@@ -1,0 +1,669 @@
+\documentclass[openany]{scrartcl}
+%\usepackage{draftwatermark}  %%%%Marca de agua
+%\setWatermarkText{
+%Marca de Agua
+%}
+%\SetWatermarkColor{gray!30}
+%\SetWatermarkScale{1.5}
+
+%\usepackage{profcollege}
+
+\usepackage{xparse}
+
+\usepackage{dingbat} %\smallpencil
+\usepackage{xlop}
+
+\usepackage[spanish,es-noshorthands]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{expl3}
+
+\ExplSyntaxOn
+\renewcommand\thepage{\int_to_bin:n{\value{page}}}  %En binario
+\ExplSyntaxOff  
+
+\usepackage{tcolorbox} % Cajas
+\usepackage{amsmath}  % Simbolos matematicos
+
+
+\usepackage{xcolor}                %Colores adicionales
+
+
+\usepackage[papersize={216mm,330mm},tmargin=5mm,bmargin=5mm,lmargin=5mm,rmargin=5mm]{geometry}
+
+\usepackage{clock}
+\usepackage[clock]{ifsym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{multicol}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=red,
+}
+
+%%%%%%%%%%%%%%%%%%%%%%Numeracion de pagina
+\usepackage{scrlayer-scrpage} 
+\usepackage{tikzducks}
+
+
+%\setlength{\footheight}{100pt}
+%\cfoot{%
+%    \shuffleducks
+%    \begin{tikzpicture}[scale=0.8] 
+%        \duck[signpost=\scalebox{0.6}{\thepage},\randomhead]
+%    \end{tikzpicture}
+%} 
+%\pagestyle{scrheadings}
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\thesection}{\Alph{section}} %Contador Alfabetico para las secciones
+
+\usepackage{titlesec}
+\titleformat{\section}[frame]
+{\normalfont\bfseries\Large}
+{\filright
+%\footnotesize
+\enspace \thesection \enspace}
+{8pt}
+{\Large\bfseries\filcenter}
+
+\titleformat{\subsection}[wrap]
+{\normalfont\fontseries{b}\selectfont\filright}
+{\textcolor{carmine}{\thesubsection}}{.5em}{}
+\titlespacing{\subsection}
+{12pc}{1.5ex plus .1ex minus .2ex}{1pc}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\usepackage{multicol}
+
+\usepackage{sagetex}
+
+
+\usepackage{tikz}
+\usetikzlibrary{mindmap,trees}
+\usetikzlibrary{angles, quotes, arrows, arrows.meta}
+\usetikzlibrary{shadows}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{calc}
+ \usetikzlibrary{decorations.markings}
+ 
+ 
+ 
+ %%%%% Grafica suma enteros
+\newcommand{\sumaderecha}[3]{%
+\begin{tikzpicture}[out=45,in=135,relative,>=stealth]
+\draw[<->] (#1-2,0)--(#2+2,0);
+\foreach \x in {\number\numexpr#1-1\relax,...,\number\numexpr#2+1\relax}  
+\draw[shift={(\x,0)},color=black] (0pt,2pt) -- (0pt,-2pt) node[below] {\footnotesize $\x$};
+\fill (#1,0) circle (2pt);
+\fill (#2,0) circle (2pt);
+
+\pgfmathsetmacro{\End}{#2-1} 
+ \draw[#3,shorten >=2pt]
+ \foreach \i in {#1,...,\End}{%
+    (\i,0) to (\i+1,0)
+} ; 
+\node[color=black] at (#2,-0.75) {\small Final};
+\node[color=black] at (#1,-0.75) {\small Inicio};
+ \pgfmathsetmacro{\xtxt}{(#1+#2)/2}
+\node at (\xtxt,0.5) {\small Moverse \number\numexpr#2-#1\relax\ unidades hacia la \emph{derecha}};
+\end{tikzpicture}}
+
+\newcommand{\sumaizquierda}[3]{%
+\begin{tikzpicture}[out=135,in=45,>=stealth]
+\draw[<->] (#2-2,0)--(#1+2,0);
+\foreach \x in {\number\numexpr#2-1\relax,...,\number\numexpr#1+1\relax}
+\draw[shift={(\x,0)},color=black] (0pt,2pt) -- (0pt,-2pt) node[below] {\footnotesize $\x$};
+\fill (#1,0) circle (2pt);
+\fill (#2,0) circle (2pt);
+
+\pgfmathsetmacro{\End}{#2+1} 
+ \draw[#3,shorten >=2pt]
+ \foreach \i in {#1,...,\End}{%
+    (\i,0) to  (\i-1,0)
+} ; 
+\node[color=black] at (#2,-0.75) {\small Final };
+\node[color=black] at (#1,-0.75) {\small Inicio };
+ \pgfmathsetmacro{\xtxt}{(#1+#2)/2}     
+\node at (\xtxt,0.5) {\small Moverse \number\numexpr-#2+#1\relax\ unidades hacia la \emph{izquierda}};
+\end{tikzpicture}} 
+
+
+%%%%%%%% Fracciones
+
+\newcount\segmentsleft
+\tikzset{pics/.cd,
+  circle fraction/.style args={#1/#2}{code={%
+\segmentsleft=#1\relax
+\pgfmathloop
+\ifnum\segmentsleft<1\else
+\ifnum\segmentsleft<#2 \edef\n{\the\segmentsleft}\else\def\n{#2}\fi
+\begin{scope}[shift={(\pgfmathcounter,0)}]
+\foreach \i [evaluate={\a=360/#2*(\i-1)+90;}] in {1,...,\n}
+  \fill[fill=gray] (0,0) -- (\a:3/8) arc (\a:\a+360/#2:3/8) -- cycle;
+\draw circle [radius=3/8];
+\ifnum#2>1
+  \foreach \i [evaluate={\a=360/#2*(\i-1);}] in {1,...,#2}
+    \draw (0,0) -- (90+\a:3/8);
+\fi
+\end{scope}
+\advance\segmentsleft by-#2
+\repeatpgfmathloop
+  }}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcount\tikzfractiondenominator
+\newcount\tikzfractionnumerator
+\def\tikzfractionempty{}
+\let\tikzfractionstyle=\tikzfractionempty
+\newif\iftikzfractionfill
+\tikzset{pics/.cd,
+  fraction/.style={%
+    code={%
+      \tikzset{pics/fraction/.cd, #1}%
+      \pgfmathparse{int(ceil(\tikzfractionnumerator/\tikzfractiondenominator))}%
+      \let\tikzfractionshapetotal=\pgfmathresult
+      \ifx\tikzfractionstyle\tikzfractionempty
+      \else%
+        \pgfmathloop
+          \ifnum\tikzfractionnumerator<1
+        \else
+          \pgfmathsetmacro\tikzfractionproper{int(\tikzfractionnumerator?\tikzfractionnumerator:\tikzfractiondenominator)}%
+          \foreach \tikzfractionsegmentnumber in {1,...,\tikzfractiondenominator}{%
+            \ifnum\tikzfractionsegmentnumber>\tikzfractionproper\relax%
+              \tikzfractionfillfalse%
+            \else%
+              \tikzfractionfilltrue%
+            \fi%
+            \let\tikzfractionshapenumber=\pgfmathcounter%
+            \begin{scope}
+              \tikzset{pics/fraction/\tikzfractionstyle/shape position/.try}%
+              \tikzset{pics/fraction/\tikzfractionstyle/segment position/.try}%
+              \tikzset{pics/fraction/\tikzfractionstyle/segment draw/.try}%
+            \end{scope}
+          }% 
+          \advance\tikzfractionnumerator by-\tikzfractiondenominator%
+        \repeatpgfmathloop%
+      \fi%
+    }
+  },
+  fraction/.cd,
+    style/.store in=\tikzfractionstyle,
+    numerator/.code=\pgfmathsetcount\tikzfractionnumerator{#1},
+    denominator/.code=\pgfmathsetcount\tikzfractiondenominator{#1},
+    fraction/.style args={#1/#2}{%
+      /tikz/pics/fraction/.cd,
+        numerator={#1}, denominator={#2}
+    }
+}
+\tikzset{%
+  /tikz/pics/fraction/triangles/.cd,
+    shape position/.code={
+      \pgfmathsetmacro\y{sqrt(\tikzfractiondenominator)}
+      \tikzset{
+        shift=(0:{(\tikzfractionshapenumber-1)*\y}),
+        shift={(0,\y/4)},
+      }
+    },
+    segment position/.code={
+      \let\i=\tikzfractionsegmentnumber
+      \pgfmathsetmacro\z{int(sqrt(\i-1))}
+      \pgfmathsetmacro\q{\i-(\z)^2}
+      \tikzset{
+        shift={({sin(60) * (\q-\z) / 2}, {-\z*0.75 -mod(\q,2)*cos(60)/2})},
+        rotate={mod(\q-1,2)*180}
+      }
+    },
+    segment draw/.code={
+      \iftikzfractionfill
+        \tikzset{triangle fill/.style={blue!50!cyan!50}}
+      \else
+        \tikzset{triangle fill/.style={gray!20}}
+      \fi
+      \fill [triangle fill] (90:0.45) -- (210:0.45) -- (330:0.45) -- cycle;
+    }
+}
+ 
+ 
+ %%%%%%%%% recta numeros mixtos
+ % ref: WeCanLearnAnything at http://tex.stackexchange.com/questions/267921/macro-for-mixed-numbers-on-number-line-tikz (but I doubt this is the original source)
+%\NewDocumentCommand\NL { s m m m m m }
+%{\tikz[xscale=#2,yscale=#3]
+% {
+% \filldraw[orange] (0,0) rectangle (#6,0.2);% shaded portion of number line
+% \draw
+%  (0,0)--(#4,0)% lower part of x-axis
+%  (0,0.2)--(#4,0.2);% higher part of x-axis
+% \foreach \x in {0,...,#4}
+%  \node [anchor=mid] at (\x,-0.5) {\x};% whole numbers underneath number line
+%  \pgfmathparse{#4*#5}
+% \foreach \x in {0,...,\pgfmathresult}% fractional tick marks and numbers above number line
+%  {
+%   \draw (\x/#5,-0.2)--(\x/#5,0.2);
+%   \node[above] at (\x/#5,0.25) {$\frac{\x}{#5}$};
+%   \IfBooleanF {#1}{
+%     \pgfmathsetmacro\intbit{int(\x/#5)}
+%     \pgfmathsetmacro\fracbit{int(\x-#5*\intbit)}
+%     \ifnum\intbit=0\let\intbit\relax\fi
+%     \ifnum\fracbit=0\else
+%     \node [anchor=mid] at (\x/#5,-0.5) {$\intbit\frac{\fracbit}{#5}$};
+%     \fi
+%   }
+%  }
+% \fill[green,opacity=0.75] (#6,0.1) circle[x radius=0.2cm/#2,y radius=0.2cm/#3];% green dot
+% }
+%}
+
+
+%% En el cuerpo
+%\NL{4}{1.2}{3}{4}{7/4}
+%\NL*{4}{1.2}{3}{4}{7/4}
+ %{x-scale}{y-scale}{from 0 to 3}{denominator}{emphasized point}
+ 
+ 
+ %%%%%%%%%%%%%%
+ 
+ 
+\makeatletter
+\newif\ifnl@mixednumbers
+\tikzset{% http://tex.stackexchange.com/a/159856/ - Claudio Fiandrino
+  number line/.code={
+    \tikzset{
+      /number line/.cd,%
+      #1
+    }
+  },
+  /number line/.cd,
+  fraction/.store in=\nl@fraction,
+  v scale/.store in=\nl@vscale,
+  h scale/.store in=\nl@hscale,
+  max/.store in=\nl@max,
+  number to/.store in=\nl@numberto,
+  mixed numbers/.is if=nl@mixednumbers,
+  fill/.store in=\nl@fill,
+  dot/.store in=\nl@dot,
+  dot opacity/.store in=\nl@dotopacity,
+  fraction=4,
+  v scale=1.2,
+  h scale=4,
+  max=3,
+  number to={7/4},
+  mixed numbers=false,
+  fill=orange,
+  dot=green,
+  dot opacity=.75,
+}
+\newcommand*\tnl{% modified from ref: WeCanLearnAnything at http://tex.stackexchange.com/questions/267921/macro-for-mixed-numbers-on-number-line-tikz (but I doubt this is the original source)
+  \begin{scope}[xscale=\nl@hscale,yscale=\nl@vscale]
+    \filldraw[\nl@fill] (0,0) rectangle (\nl@numberto,0.2);% shaded portion of number line
+    \draw
+    (0,0)--(\nl@max,0)% lower part of x-axis
+    (0,0.2)--(\nl@max,0.2);% higher part of x-axis
+    \foreach \x in {0,...,\nl@max}
+      \node [anchor=mid] at (\x,-0.5) {\x};% whole numbers underneath number line
+    \pgfmathparse{\nl@max*\nl@fraction}
+    \foreach \x in {0,...,\pgfmathresult}% fractional tick marks and numbers above number line
+    {
+      \draw (\x/\nl@fraction,-0.2)--(\x/\nl@fraction,0.2);
+      %\node[above] at (\x/\nl@fraction,0.25) {$\frac{\x}{\nl@fraction}$};
+      \ifnl@mixednumbers
+        \pgfmathsetmacro\intbit{int(\x/\nl@fraction)}
+        \pgfmathsetmacro\fracbit{int(\x-\nl@fraction*\intbit)}
+        \ifnum\intbit=0\let\intbit\relax\fi
+        \ifnum\fracbit=0\else
+          \node [anchor=mid] at (\x/\nl@fraction,-0.5) {$\intbit\frac{\fracbit}{\nl@fraction}$};
+        \fi
+      \fi
+    }
+    \fill[\nl@dot,opacity=\nl@dotopacity] (\nl@numberto,0.1) circle[x radius=0.2cm/\nl@hscale,y radius=0.2cm/\nl@vscale];% green dot
+  \end{scope}}
+\NewDocumentCommand \NumberLine { s O {} }{%
+  \IfBooleanTF {#1}{%
+    \tikz[number line={mixed numbers=false,#2}]\tnl;%
+  }{%
+    \tikz[number line={mixed numbers=true,#2}]\tnl;%
+  }}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%
+ 
+ 
+ 
+ 
+ 
+ \begin{document}
+
+%Se necesitan las imagenes enae.jpeg y mani.png
+%\hspace*{-1cm}\includegraphics[height=1.6cm]{img/\string"enae\string".jpeg}\hspace*{15cm}  \includegraphics[height=1.6cm]{img/\string"mani\string".png}
+
+
+%\begin{center}I. E. Escuela Nacional Auxiliares de Enfermeria\\
+%                Matemáticas - S\'eptimo \\
+%                Suma de n\'umeros enteros\\
+%                Docente: Yamit Lopez Muñoz\\
+%                E-mail: \href{mailto:yamitlopezm@gmail.com}{yamitlopezm@gmail.com}
+%                
+%                \end{center}
+%                
+%
+%
+%\hspace*{-1.8cm} { \small Lee atentamente \ClockFrametrue\ClockStyle=1\clock{12}{3} \textit{3 minutos.}} $\curvearrowright$  
+%
+%\begin{tcolorbox}
+%INDICACIONES:
+%
+%\begin{itemize}
+%\item Bla bla
+%\item Bla bla
+%\item Bla bla
+%\item Bla bla
+%\end{itemize}
+%
+%\end{tcolorbox}
+%
+%
+%\section{Vivencia}
+%
+
+
+%\renewcommand{\theenumi}{\arabic{enumi}} %Números romanos en minúscula
+
+\renewcommand{\labelenumi}{{\theenumi})}
+
+\begin{sagesilent}
+ 
+ 
+alumnas=[
+  "AGUIRRE SALAZAR NIKOLLE".lower()   
+,"ARCILA PUENTES VALERIA".lower()
+,"BEDOYA AGUDELO NABRI SAMANTHA".lower()
+,"BERMUDEZ BAÑOL VALERIA".lower()
+,"BUSTOS OROZCO ANA ISABEL".lower() 
+#,"CARDENAS QUINTERO ISABELA".lower() 
+,"CHIVATA CARMONA SARA SOFIA".lower()
+,"CORTES MONTOYA ISABELLA".lower() 
+,"GARCIA MONSALVE NICOLE".lower() 
+,"GARCIA PEREZ MANUELA".lower() 
+,"GAVIRIA SOTO JULIANA".lower() 
+,"GOMEZ RUIZ JUANITA".lower() 
+,"GUTIERREZ TANGARIFE SALOME".lower() 
+,"HERNANDEZ VERGARA SAMANTHA".lower() 
+,"HERRERA SALINAS SALOME".lower() 
+,"JARAMILLO PEREZ HELEN DAYANNA".lower()
+,"JARAMILLO RAMIREZ SALOME".lower() 
+,"LOPEZ GOMEZ MARIA VICTORIA".lower()
+,"LOPEZ MARIN PAULA ANDREA".lower()
+,"LOPEZ ORTEGON LUCIANA".lower() 
+,"MARIN DIAZ ISABEL SOFIA".lower()
+,"MEJIA CARDENAS LAUREN DAYANA".lower()
+,"PARRA ROBLEDO ISABELA".lower() 
+,"RAMIREZ ROJAS CAMILA".lower() 
+,"RAMIREZ ROJAS CAROLINA".lower() 
+,"RENDON VARGAS MARIA FERNANDA".lower()
+,"RIVERA PATIÑO SALOME".lower() 
+,"ROMAN MARIN ESTEFANY".lower() 
+,"SALAZAR ARANGO MARIANA".lower() 
+,"SALAZAR POSADA VALENTINA".lower() 
+,"SANABRIA OSPINA SOFIA".lower() 
+,"VALENCIA AGUIRRE MARIA JOSE".lower()
+,"VALENCIA BURGOS VALERIA".lower() 
+,"VALENCIA ORTEGA  ANA CAMILA".lower()
+]
+
+def signo(a):
+   if a>=0:
+      return str(a)
+   else:
+      aux= "(" + str(a) + ")"
+      return aux   
+
+
+problema =  r""
+sol = r""
+
+  
+for i in range(0, len(alumnas)):
+   problema += r"\begin{tcolorbox}[colframe=white, coltitle=black, colback=white, title= 7-1 %s) %s (Suma de fracciones)]"%(latex(i+1),   latex(alumnas[i].upper()))
+   sol += r"\begin{tcolorbox}[colframe=white, coltitle=black, colback=white, title= 7-1 %s) %s (Suma de fracciones - Solución)]"%(latex(i+1),   latex(alumnas[i].upper()))
+   problema += r"\begin{itemize}"
+   sol += r"\begin{itemize}"
+   problema += r"\item Halle el mínimo común múltiplo de los denominadores para realizar la suma indicada:"
+   sol += r"\item Halle el mínimo común múltiplo de los denominadores para realizar la suma indicada:"
+   problema += r"\begin{enumerate}"
+   sol += r"\begin{enumerate}"
+   problema += r"\begin{multicols}{2}"
+   sol += r"\begin{multicols}{2}"
+	   
+   for j in range(0,80):
+       b = choice(list(range(-20,0))+list(range(1,21)))
+       a = choice(list(range(-20,0))+list(range(1,21)))
+       d = choice(list(range(-20,0))+list(range(1,21)))
+       c = choice(list(range(-20,0))+list(range(1,21)))
+       m=lcm(b,d)
+       r = m/b
+       s = m/d
+       problema += r"\item $\frac{%s}{%s}+\frac{%s}{%s}=$"%(a,b,c,d)
+       sol += r"\item $\frac{%s}{%s}+\frac{%s}{%s}=\frac{%s(%s)+%s(%s)}{%s}=\frac{%s+%s}{%s}=\frac{%s}{%s}$"%(a,b,c,d,a,r,c,s,m,a*r, signo(c*s),m,a*r+c*s,m)
+   problema += r"\end{multicols}"   
+   sol += r"\end{multicols}"
+   problema += r"\end{enumerate}"
+   sol += r"\end{enumerate}"   
+   problema += r"\end{itemize}"       
+   sol += r"\end{itemize}"     
+   problema += r"\end{tcolorbox}"
+   sol += r"\end{tcolorbox}"
+   
+
+\end{sagesilent}
+
+%\begin{enumerate}
+%\item Escriba la fracción que representa cada una de las siguientes gráficas
+%
+%\begin{tikzpicture}
+%\foreach \numerator/\denominator [count=\y] 
+%in {1/1, 1/3, 2/4, 3/5, 8/8, 4/1, 10/3, 20/6, 30/7, 40/15}{
+%\node at (-1/2,-\y) {$\frac{\numerator}{\denominator}$};
+%\pic  at (0, -\y) {circle fraction={\numerator/\denominator}};
+%}
+%\end{tikzpicture}
+%
+%\tikz{ \node at (-0.5,0) {$\frac{\quad}{\quad}$}; \pic  at (0, 0) {circle fraction={1/2}};}
+%
+%\end{enumerate}
+
+
+%\begin{tikzpicture}
+%\foreach \numerator/\denominator [count=\y]  in {1/1, 2/4, 13/9}{
+%\tikzset{shift=(270:\y*2)}
+%\pic {fraction={style=triangles, fraction={\numerator/\denominator}}};
+%\node at (-1,0)  {$\frac{\numerator}{\denominator}$};
+%}
+%\end{tikzpicture}
+%
+%
+%\tikzset{%
+%  /tikz/pics/fraction/petals/.cd,
+%    shape position/.code={
+%      \tikzset{
+%        shift=(360/\tikzfractionshapetotal*\tikzfractionshapenumber:2)
+%      }
+%    },
+%    segment position/.code={
+%      \tikzset{
+%        rotate=(360/\the\tikzfractiondenominator*\tikzfractionsegmentnumber)
+%      }
+%    },
+%    segment draw/.code={
+%      \iftikzfractionfill
+%        \tikzset{petal/.style={bottom color=purple, top color=pink}}
+%      \else
+%        \tikzset{petal/.style={bottom color=yellow!50, top color=orange!50}}
+%      \fi
+%      \pgfmathparse{180/\tikzfractiondenominator}%
+%      \let\r=\pgfmathresult
+%      \path [petal] (0:0) [rounded corners=1ex] -- 
+%        (-\r:0.5) -- (0:.75) -- (\r:0.5) -- cycle;
+%    }
+%}
+%
+%
+%
+%\begin{tikzpicture}
+%\pic {fraction={style=petals, fraction={53/8}}};
+%\node {$\frac{53}{8}$};
+%\end{tikzpicture}
+%
+%
+%\begin{tikzpicture}
+%\pic {fraction={style=petals, fraction={11/5}}};
+%\node {$\frac{\quad}{\quad}$};
+%\end{tikzpicture}
+%
+%Dibuja y rotula una recta numérica del $0$ al $3$ con marcas en cada cuarto, enfatizando  los números mixtos, por ejemplo: \(\frac{7}{4}=1\frac{3}{4}\). Muestre su respuesta usando una longitud y un punto
+%
+%
+%
+%%\NumberLine
+%
+%%\NumberLine*
+%
+%\NumberLine[dot=green,dot opacity=.75,fill=orange,max= 3,fraction=2,mixed numbers=false, number to={4/2},h scale=5,v scale = 1.2]
+%
+%
+%\NumberLine[dot=green,dot opacity=.75,fill=orange,max= 3,fraction=5,mixed numbers=false,number to={7/5},h scale=5,v scale = 1.2]
+%
+%\NumberLine[dot=green,dot opacity=.75,fill=orange,max= 2,fraction=10,mixed numbers=false,number to={1/10},h scale=10,v scale = 1.2]
+%
+
+
+%\tikzset{
+%  number line={
+%    fraction=5,
+%    mixed numbers=,
+%    number to={6/12},
+%    h scale=8,
+%    v scale=1.25,
+%    max=2,
+%  }
+%}
+%
+%\begin{tikzpicture}
+%  \tnl;
+%  \begin{scope}[yshift=-30mm]
+%    \tnl;
+%  \end{scope}
+%\end{tikzpicture}
+
+
+%\begin{tikzpicture}
+%    \filldraw[gray!50] (0,0) rectangle (2.5,.5) ; 
+%    \draw[step=5mm] (0,0) grid (4.5,.5) ;
+%    \foreach \x [evaluate=\x as \xpos using \x*1.5] in {0,...,3}
+%      { \draw (\xpos,0)--++(0,-.2) node[below] {\x} ; }
+%  \end{tikzpicture}
+%  
+%  \usetikzlibrary{svg.path}
+%  
+%  \begin{tikzpicture}
+%  \draw svg "M108 28v40l-60 60-20-60z";
+%  \end{tikzpicture}
+%
+
+%\begin{titlepage}
+%\textbf{\Huge Me} 
+%\end{titlepage}
+
+% \part*{heading } 
+% \chapter*{heading } 
+% \section*{heading } 
+% \subsection*{heading } 
+% \subsubsection*{heading } 
+% \paragraph*{heading } 
+% \subparagraph*{heading }
+ 
+ 
+%\textbf{¿Qué es una fracción?}
+%
+%
+%
+%Una fracción representa el número de partes que cogemos de una unidad que está dividida en partes iguales. Se representa por dos números separados por una línea de fracción.
+%
+%\begin{center}
+%\begin{tikzpicture}
+%\fill[gray!60] (0,1) rectangle (1,2);
+%\foreach \x in {0,1}{
+%\foreach \y in {0,1}
+%\draw (\x, \y) rectangle (\x+1, \y+1);
+%}
+%\draw (3.5, 1)  node {\Huge $\frac{1}{4}$};
+%\end{tikzpicture}
+%\end{center}
+%
+%\textbf{Términos de una fracción}
+%
+%Los términos de una fracción son el numerador y el denominador. El numerador es el número de partes que tenemos y el denominador es el número de partes en que hemos dividido la unidad.
+%
+%Veamos algunos ejemplos: Tenemos diferentes figuras que representan la unidad, cada una de ellas la dividimos en partes iguales que determinan el denominador. La partes coloreadas representan el numerador.
+%\begin{center}
+%\begin{tikzpicture}[scale=0.8]
+%\begin{scope}[shift={(1,3)}]
+%\fill[gray!60] (0,2) rectangle (2, 3);
+%\draw (0,0) grid[xstep=2 , ystep=1 ] ++(2,3);
+%\draw (1, -1) node {\Huge $\frac{1}{3}$};
+%\end{scope}
+%\begin{scope}[shift={(5,3)}]
+%\fill[gray!60] (0.5, 0)--(0.5, 1.5)--(0, 1.5)--(0,3)--(2, 3)--(2,0)--cycle; 
+%\draw (0,0) grid[xstep=0.5 , ystep=1.5 ] ++(2,3);
+%\draw (1, -1) node {\Huge $\frac{7}{8}$};
+%\end{scope}
+%\begin{scope}[shift={(9,3)}]
+%\fill[gray!60] (0,3)-- (2,0)--(0,0) -- cycle;
+%\draw (0,0) rectangle ++(2,3);
+%\draw (0,3) -- (2,0); 
+%\draw (1, -1) node {\Huge $\frac{1}{2}$};
+%\end{scope}
+%\begin{scope}[shift={(13,3)}]
+%\fill[gray!60] (0,0)-- (0,3)--(2/4,3)--(2/4, 0) -- cycle;
+%\draw (0,0) grid[xstep=2/4 , ystep=3 ] ++(2,3);
+%\draw (1, -1) node {\Huge $\frac{1}{4}$};
+%\end{scope}
+%\begin{scope}[shift={(17,3)}]
+%\fill[gray!60] (0,3/5)-- (0,3)--(2,3)--(2, 3/5) -- cycle;
+%\draw (0,0) grid[xstep=2 , ystep=3/5 ] ++(2,3);
+%\draw (1, -1) node {\Huge $\frac{4}{5}$};
+%\end{scope}
+%\end{tikzpicture}
+%\end{center}
+%
+%
+%\textbf{¿Cómo se leen las fracciones?}
+%
+%El numerador se lee con los números cardenales. $1$ – un, $2$ – dos, $3$ – tres, …, $10$ – diez, …, $24$ – veinticuatro…
+%
+%El denominador se lee con los números partitivos. $2$ – medios, $3$ – tercios, $4$ – cuartos, $5$ – quintos, $6$ – sextos, $7$ – séptimos, $8$ – octavos, $9$ – novenos, $10$ – décimos. A partir del $11$, el número se lee terminado en -avos: $11$ – onceavos, $12$ – doceavos, …
+%
+%\textbf{Tipos de fracciones}
+%\begin{itemize}
+%\item Fracción propia: Cuando el numerador es menor que el denominador.
+%\item Fracción impropia: Cuando el numerador es mayor que el denominador.
+%\item Fracción unitaria: Cuando el numerador es igual que el denominador.
+%\end{itemize}
+
+
+
+\sagestr{problema}
+\sagestr{sol}
+
+
+
+
+
+\end{document}
+
